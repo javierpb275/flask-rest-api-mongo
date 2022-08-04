@@ -34,6 +34,15 @@ def create_user():
     return response
 
 
+@app.route('/users/<string:user_id>', methods=['DELETE'])
+def delete_user(user_id):
+    users_col.delete_one({'_id': ObjectId(user_id)})
+    response = jsonify({
+        'message': 'User ' + user_id + ' was deleted successfully',
+    })
+    return response
+
+
 @app.route('/users', methods=['GET'])
 def get_users():
     users = users_col.find()
