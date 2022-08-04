@@ -1,6 +1,8 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, Response
 import pymongo
 from werkzeug.security import generate_password_hash, check_password_hash
+from bson import json_util
+from bson.objectid import ObjectId
 
 app = Flask(__name__)
 
@@ -30,6 +32,20 @@ def create_user():
         'email': email
     }
     return response
+
+
+@app.route('/users', methods=['GET'])
+def get_users():
+    users = users_col.find()
+    response = json_util.dumps(users)
+    return Response(response, mimetype='application/json')
+
+
+@app.route('/users/<string:user_id>', methods=['GET'])
+def get_user(user_id):
+    user = users_col.find_one({'_id': ObjectId(user_id)})
+    response = json_util.dumps(user)
+    return Response(response, mimetype='application/json')
 
 
 @app.errorhandler(404)
