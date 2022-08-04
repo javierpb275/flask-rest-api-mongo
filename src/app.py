@@ -43,6 +43,26 @@ def delete_user(user_id):
     return response
 
 
+@app.route('/users/<string:user_id>', methods=['PUT'])
+def update_user(user_id):
+    username = request.json['username']
+    password = request.json['password']
+    email = request.json['email']
+    if not username or not email or not password:
+        return bad_request()
+    hashed_password = generate_password_hash(password)
+    users_col.update_one({'_id': ObjectId(user_id)}, {"$set": {
+        'username': username,
+        'email': email,
+        'password': hashed_password
+    }})
+    return {
+        '_id': user_id,
+        'email': email,
+        'username': username
+    }
+
+
 @app.route('/users', methods=['GET'])
 def get_users():
     users = users_col.find()
